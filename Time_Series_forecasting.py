@@ -6,7 +6,7 @@ from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 # 1. Generate synthetic time series data (Monthly Sales over 5 years)
 np.random.seed(42)
-months = pd.date_range(start='2018-01-01', periods=60, freq='M')
+months = pd.date_range(start='2018-01-01', periods=60, freq='ME')
 month_numbers = np.array(months, dtype=float)
 # ✅ FIX: Extract month numbers cleanly
 
@@ -22,6 +22,9 @@ df.set_index('Date', inplace=True)
 # 3. Train/Test Split
 train = df.iloc[:-12]
 test = df.iloc[-12:]
+
+train.index.freq = 'ME'
+test.index.freq = 'ME'
 
 # 4. Holt-Winters Model (Triple Exponential Smoothing)
 model = ExponentialSmoothing(train['Sales'],
@@ -42,10 +45,11 @@ plt.figure(figsize=(12, 6))
 plt.plot(train.index, train['Sales'], label='Training Data', color='blue')
 plt.plot(test.index, test['Sales'], label='Actual Sales', color='green')
 plt.plot(test.index, forecast, label='Forecasted Sales', color='red', linestyle='--')
-plt.title('📈 Monthly Sales Forecast using Holt-Winters Method', fontsize=16)
+plt.title('Monthly Sales Forecast using Holt-Winters Method', fontsize=16)
 plt.xlabel('Date')
 plt.ylabel('Sales')
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
+plt.savefig('forecast_plot.png', bbox_inches='tight')
 plt.show()
